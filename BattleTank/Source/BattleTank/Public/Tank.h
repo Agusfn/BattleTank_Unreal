@@ -20,9 +20,6 @@ class BATTLETANK_API ATank : public APawn
 public:
 
 
-
-	void AimAt(FVector Location);
-
 	UFUNCTION(BlueprintCallable)
 	void Fire();
 

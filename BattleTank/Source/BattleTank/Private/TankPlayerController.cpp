@@ -1,7 +1,6 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "TankPlayerController.h"
-#include "Tank.h"
 #include "Engine/World.h"
 #include "TankAimingComponent.h"
 
@@ -10,14 +9,12 @@ void ATankPlayerController::BeginPlay() // no necesita "override"
 {
 	Super::BeginPlay(); // llamar BeginPlay de la/s clases superiores
 
-	ControlledTank = GetControlledTank();
-
 	// Ubicamos el aiming component para pasarle la ref. por BP al UI Widget
-	UTankAimingComponent* AimingComponent = ControlledTank->FindComponentByClass<UTankAimingComponent>();
-	if (ensure(AimingComponent))
-	{
-		FoundAimingComponent(AimingComponent);
-	}
+	UTankAimingComponent* AimingComponent = GetPawn()->FindComponentByClass<UTankAimingComponent>();
+	if (!ensure(AimingComponent)) { return;  }
+	
+	FoundAimingComponent(AimingComponent);
+	
 }
 
 void ATankPlayerController::Tick(float DeltaTime)
@@ -26,22 +23,17 @@ void ATankPlayerController::Tick(float DeltaTime)
 	AimTankTowardsCrosshair();
 }
 
-ATank* ATankPlayerController::GetControlledTank() const 
-{
-	return Cast<ATank>(GetPawn());
-
-}
-
 
 void ATankPlayerController::AimTankTowardsCrosshair()
 {
-	if (!ensure(ControlledTank)) { return;  }
+	UTankAimingComponent* AimingComponent = GetPawn()->FindComponentByClass<UTankAimingComponent>();
+	if (!ensure(AimingComponent)) { return; }
 
 	FVector OutHitLocation; // Out Parameter
 
 	if (GetSightRayHitLocation(OutHitLocation)) // aiming at existing world point
 	{
-		ControlledTank->AimAt(OutHitLocation);
+		AimingComponent->AimAt(OutHitLocation);
 	}
 		
 }

@@ -6,8 +6,6 @@
 #include "GameFramework/PlayerController.h"
 #include "TankPlayerController.generated.h"
 
-class ATank;
-
 /**
  * Responsible for helping the player aim
  */
@@ -18,16 +16,11 @@ class BATTLETANK_API ATankPlayerController : public APlayerController
 
 
 protected:
-	// Para acceder al método desde TankPlayerController_BP (hija de esta clase)
-	UFUNCTION(BluePrintCallable, Category = "Setup")
-	ATank* GetControlledTank() const;
 
 	UFUNCTION(BlueprintImplementableEvent, Category = "Setup")
 	void FoundAimingComponent(UTankAimingComponent* AimingCompRef);
 
 private:
-
-	ATank* ControlledTank;
 
 	// override para asegurarse que exista este método en alguna de las clases padre, y reemplazarlo 
 	// (TankPlayerController <- PlayerController <- Actor(ESTA))
