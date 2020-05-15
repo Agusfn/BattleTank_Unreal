@@ -38,6 +38,7 @@ void UTankMovementComponent::IntendTurnRight(float Throw)
 // Usado para movimiento AI
 void UTankMovementComponent::RequestDirectMove(const FVector& MoveVelocity, bool bForceMaxSpeed)
 {
+	//UE_LOG(LogTemp, Warning, TEXT("%s being requested direct move."), *GetOwner()->GetName())
 
 	// Obtenemos vectores unitarios de la dirección donde apunta el tanque, y la dirección donde debe dirigirse.
 	FVector TankForwardDirection = GetOwner()->GetActorForwardVector().GetSafeNormal();

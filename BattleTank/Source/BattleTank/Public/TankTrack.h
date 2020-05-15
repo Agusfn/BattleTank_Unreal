@@ -15,7 +15,7 @@ class BATTLETANK_API UTankTrack : public UStaticMeshComponent
 	GENERATED_BODY()
 
 public:
-    
+ 
     // Max push force in Newtons
     UPROPERTY(EditDefaultsOnly)
     float TrackMaxDrivingForce = 40000000; // test value    
@@ -24,4 +24,18 @@ public:
     UFUNCTION(BluePrintCallable, Category = Input)
     void SetThrottle(float ThrottleScale);
 
+    void DriveTrack();
+
+private:
+    UTankTrack();
+
+    virtual void BeginPlay() override;
+
+    void ApplySidewaysForce();
+
+    UFUNCTION()
+    void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit);
+
+
+    float CurrentThrottle;
 };

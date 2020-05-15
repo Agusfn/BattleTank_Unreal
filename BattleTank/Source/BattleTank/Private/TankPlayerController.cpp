@@ -26,6 +26,8 @@ void ATankPlayerController::Tick(float DeltaTime)
 
 void ATankPlayerController::AimTankTowardsCrosshair()
 {
+	if (!GetPawn()) { return; }
+
 	UTankAimingComponent* AimingComponent = GetPawn()->FindComponentByClass<UTankAimingComponent>();
 	if (!ensure(AimingComponent)) { return; }
 
@@ -52,13 +54,15 @@ bool ATankPlayerController::GetSightRayHitLocation(FVector& OutHitLocation) cons
 	if (GetLookDirectionFromScreenPoint(Crosshair2DLoc, OutLookDirection))
 	{
 		// Hacemos line tracing hacia esa direccion del mundo
-		GetLookVectorHitLocation(OutLookDirection, OutHitLocation);
+		return GetLookVectorHitLocation(OutLookDirection, OutHitLocation);
 	}
 
-	return true;
+	return false;
 }
 
 
+// Obtiene la dirección en donde apunta el crosshair, saliendo de la cámara.
+// Devuelve false si no se apunta a ningun objeto (creo)
 bool ATankPlayerController::GetLookDirectionFromScreenPoint(FVector2D ScreenLocation, FVector& LookDirection) const
 {
 	FVector OutCameraWorldLocation; // not used
@@ -72,7 +76,8 @@ bool ATankPlayerController::GetLookDirectionFromScreenPoint(FVector2D ScreenLoca
 }
 
 
-/* obtener ubicación del primer objeto que se interpone entre una recta que sale desde cámara en dirección LookDirection */
+// obtener la posicion del mundo de la interseccion entre una recta que sale desde cámara en dirección LookDirection, y el primer cuerpo que se interponga
+// Devuelve true si existe la posicion, y false si no existe (se apunta al cielo)
 bool ATankPlayerController::GetLookVectorHitLocation(FVector LookDirection, FVector& HitLocation) const
 {
 	FHitResult HitResult;
