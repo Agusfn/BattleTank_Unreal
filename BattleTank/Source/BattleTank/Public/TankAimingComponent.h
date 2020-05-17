@@ -47,6 +47,9 @@ protected:
 	UPROPERTY(BlueprintReadOnly, Category = "State")
 	EFiringState FiringState = EFiringState::Reloading;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Setup")
+	TSubclassOf<AProjectile> ProjectileBlueprint; // alguna clase subclase de AProjectile. En este caso va a ser únicamente Projectile_BP
+
 private:	
 
 	// Sets default values for this component's properties
@@ -66,18 +69,18 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Firing")
 	float ProjectileSpeed = 4000; // 40m/s
 
-	UPROPERTY(EditDefaultsOnly, Category = "Setup")
-	TSubclassOf<AProjectile> ProjectileBlueprint; // alguna clase subclase de AProjectile. En este caso va a ser únicamente Projectile_BP
-
 	// Permite sólo editar la propiedad para la clase de forma general, no individualmente para cada instancia.
 	UPROPERTY(EditDefaultsOnly, Category = "Firing")
 	float ReloadTimeInSeconds = 3;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Firing")
+	int32 AmmoAmount = 10;
 
 	double LastFireTime = 0;
 
 	FVector TargetAimDirection;
 
-	int32 AmmoAmount = 10;
+
 
 		
 };

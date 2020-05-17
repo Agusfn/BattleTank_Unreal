@@ -6,12 +6,18 @@
 #include "GameFramework/Pawn.h"
 #include "Tank.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FTankDelegate);
 
 UCLASS()
 class BATTLETANK_API ATank : public APawn
 {
 	GENERATED_BODY()
 
+public:
+	UFUNCTION(BlueprintPure, Category = "Health")
+	float GetHealthPercentage() const;
+
+	FTankDelegate OnDeath;
 
 private:
 
@@ -20,6 +26,12 @@ private:
 
 	virtual void BeginPlay() override;
 
-	
+	// overrideada de APawn. Se llama automáticamente cuando se aplica daño con la funcion del juego UGameplayStatics::ApplyRadialDamage u otra
+	virtual float TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
+
+	UPROPERTY(EditAnywhere, Category = "Setup")
+	int32 MaxHealth = 100;
+
+	int32 CurrentHealth = 1;
 
 };

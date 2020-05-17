@@ -3,13 +3,35 @@
 #include "TankAIController.h"
 #include "Engine/World.h"
 #include "TankAimingComponent.h"
-
-
+#include "Tank.h"
 
 
 void ATankAIController::BeginPlay()
 {
 	Super::BeginPlay();
+}
+
+
+// overrideado, se llama cuando se toma posesion del pawn
+void ATankAIController::SetPawn(APawn* InPawn)
+{
+	Super::SetPawn(InPawn);
+
+	if (InPawn)
+	{
+		PossesedTank = Cast<ATank>(InPawn);
+
+		if (!PossesedTank) { return; } // may be a mortar
+
+		//suscribir metodo local a evento de muerte tanque
+		PossesedTank->OnDeath.AddUniqueDynamic(this, &ATankAIController::OnPossesedTankDeath);
+	}
+}
+
+void ATankAIController::OnPossesedTankDeath()
+{
+	if (!PossesedTank) return;
+	PossesedTank->DetachFromControllerPendingDestroy();
 }
 
 void ATankAIController::Tick(float DeltaTime)
@@ -22,7 +44,7 @@ void ATankAIController::Tick(float DeltaTime)
 	if (!ensure(PlayerPawn && ControlledTankAimingComponent)) { return; }
 
 
-	// move tank towards player
+	// move tank towards player (mortar won't have effect)
 	MoveToActor(PlayerPawn, AcceptanceRadius);
 
 	// aim towards the player

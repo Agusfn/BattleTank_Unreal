@@ -6,6 +6,8 @@
 #include "GameFramework/PlayerController.h"
 #include "TankPlayerController.generated.h"
 
+class ATank;
+
 /**
  * Responsible for helping the player aim
  */
@@ -29,6 +31,8 @@ private:
 	
 	virtual void Tick(float DeltaTime) override;
 
+	virtual void SetPawn(APawn* InPawn) override;
+
 	void AimTankTowardsCrosshair();
 
 	bool GetSightRayHitLocation(FVector &OutHitLocation) const;
@@ -36,6 +40,9 @@ private:
 	bool GetLookDirectionFromScreenPoint(FVector2D ScreenLocation, FVector& WorldDirection) const;
 
 	bool GetLookVectorHitLocation(FVector LookDirection, FVector& HitLocation) const;
+
+	UFUNCTION()
+	void OnPossesedTankDeath();
 
 	UPROPERTY(EditDefaultsOnly)
 	float CrosshairXLocation = 0.5; // ubicación relativa del ancho de la pantalla en donde se encuentra el crosshair
@@ -45,5 +52,7 @@ private:
 
 	UPROPERTY(EditDefaultsOnly)
 	float LineTraceRange = 1000000; // unreal units (cm) (10km)
+
+	ATank* PossesedTank = nullptr;
 
 };

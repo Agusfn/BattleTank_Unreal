@@ -3,7 +3,7 @@
 #include "TankPlayerController.h"
 #include "Engine/World.h"
 #include "TankAimingComponent.h"
-
+#include "Tank.h"
 
 void ATankPlayerController::BeginPlay() // no necesita "override"
 {
@@ -17,11 +17,33 @@ void ATankPlayerController::BeginPlay() // no necesita "override"
 	
 }
 
+void ATankPlayerController::SetPawn(APawn* InPawn)
+{
+	Super::SetPawn(InPawn);
+
+	if (InPawn)
+	{
+		PossesedTank = Cast<ATank>(InPawn);
+
+		if (!ensure(PossesedTank)) { return; }
+		PossesedTank->OnDeath.AddUniqueDynamic(this, &ATankPlayerController::OnPossesedTankDeath);
+	}
+}
+
+
 void ATankPlayerController::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	AimTankTowardsCrosshair();
 }
+
+
+void ATankPlayerController::OnPossesedTankDeath()
+{
+	if (!PossesedTank) return;
+	StartSpectatingOnly();
+}
+
 
 
 void ATankPlayerController::AimTankTowardsCrosshair()
@@ -85,7 +107,10 @@ bool ATankPlayerController::GetLookVectorHitLocation(FVector LookDirection, FVec
 	FVector StartLocation = PlayerCameraManager->GetCameraLocation();
 	FVector EndLocation = StartLocation + (LookDirection * LineTraceRange);
 
-	if(GetWorld()->LineTraceSingleByChannel(HitResult, StartLocation, EndLocation, ECollisionChannel::ECC_Visibility))
+	FCollisionQueryParams CollisionParams;
+	CollisionParams.AddIgnoredActor(GetPawn());
+
+	if(GetWorld()->LineTraceSingleByChannel(HitResult, StartLocation, EndLocation, ECollisionChannel::ECC_Camera, CollisionParams))
 	{
 		HitLocation = HitResult.Location;
 		return true;

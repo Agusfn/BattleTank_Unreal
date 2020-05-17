@@ -20,7 +20,7 @@ UTankAimingComponent::UTankAimingComponent()
 
 void UTankAimingComponent::BeginPlay()
 {
-	UE_LOG(LogTemp, Warning, TEXT("BeginPlay aimingcomp"))
+	Super::BeginPlay();
 	LastFireTime = FPlatformTime::Seconds(); // GetWorld()->GetTimeSeconds() es buena opcion tambien
 }
 
