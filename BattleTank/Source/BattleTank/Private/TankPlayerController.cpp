@@ -9,6 +9,9 @@ void ATankPlayerController::BeginPlay() // no necesita "override"
 {
 	Super::BeginPlay(); // llamar BeginPlay de la/s clases superiores
 
+	
+	if (!GetPawn()) return;
+
 	// Ubicamos el aiming component para pasarle la ref. por BP al UI Widget
 	UTankAimingComponent* AimingComponent = GetPawn()->FindComponentByClass<UTankAimingComponent>();
 	if (!ensure(AimingComponent)) { return;  }

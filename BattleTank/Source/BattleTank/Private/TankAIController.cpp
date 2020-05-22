@@ -41,7 +41,7 @@ void ATankAIController::Tick(float DeltaTime)
 	UTankAimingComponent* ControlledTankAimingComponent = GetPawn()->FindComponentByClass<UTankAimingComponent>();
 	APawn* PlayerPawn = GetWorld()->GetFirstPlayerController()->GetPawn();
 
-	if (!ensure(PlayerPawn && ControlledTankAimingComponent)) { return; }
+	if (!PlayerPawn || !ControlledTankAimingComponent) { return; }
 
 
 	// move tank towards player (mortar won't have effect)

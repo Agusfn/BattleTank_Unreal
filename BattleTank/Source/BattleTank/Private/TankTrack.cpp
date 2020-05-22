@@ -2,65 +2,56 @@
 
 
 #include "TankTrack.h"
-
+#include "SprungWheel.h"
+#include "SpringSpawner.h"
 
 UTankTrack::UTankTrack()
 {
 	PrimaryComponentTick.bCanEverTick = false;
 }
 
-
-void UTankTrack::BeginPlay()
+// Obtenemos lista de todas las SprungWheel contenidas en cada Spawner de este tank track.
+TArray<class ASprungWheel*> UTankTrack::GetWheels() const
 {
-	Super::BeginPlay();
-	OnComponentHit.AddDynamic(this, &UTankTrack::OnHit);
-}
+	OUT TArray<USceneComponent*> Children;
+	GetChildrenComponents(true, Children);
 
-// se llama en cada cuadro donde las tracks están en contacto con la tierra.
-void UTankTrack::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit)
-{
-	DriveTrack();
-	ApplySidewaysForce();
-	CurrentThrottle = 0;
-}
+	TArray<ASprungWheel*> SprungWheels;
 
+	for (USceneComponent* Child : Children)
+	{
+		USpringSpawner* Spawner = Cast<USpringSpawner>(Child);
+		if (!Spawner) { continue; }
 
+		AActor* Actor = Spawner->GetSpawnedWheel();
+		ASprungWheel* SprungWheel = Cast<ASprungWheel>(Actor);
+		if (!SprungWheel) continue;
 
-void UTankTrack::ApplySidewaysForce()
-{
-	float SlippageSpeed = FVector::DotProduct(GetRightVector(), GetComponentVelocity());
-	float DeltaTime = GetWorld()->GetDeltaSeconds();
+		SprungWheels.Add(SprungWheel);
+	}
 
-	FVector CorrectionAcceleration = -SlippageSpeed / DeltaTime * GetRightVector();
-
-	UStaticMeshComponent* TankRoot = Cast<UStaticMeshComponent>(GetOwner()->GetRootComponent());
-
-	FVector CorrectionForce = TankRoot->GetMass() * CorrectionAcceleration / 2; // two tracks
-
-	TankRoot->AddForce(CorrectionForce);
+	return SprungWheels;
 }
 
 
-//
 void UTankTrack::SetThrottle(float ThrottleScale)
 {
-	CurrentThrottle = FMath::Clamp<float>(CurrentThrottle + ThrottleScale, -1, 1);
+	float CurrentThrottle = FMath::Clamp<float>(ThrottleScale, -1, 1);
+	DriveTrack(CurrentThrottle);
 }
 
-void UTankTrack::DriveTrack()
+
+
+void UTankTrack::DriveTrack(float Throttle)
 {
-	// GetForwardVector da la dirección en la que apunta este componente
-	FVector PushForce = GetForwardVector() * CurrentThrottle * TrackMaxDrivingForce;
+	float TotalForceMagnitude = Throttle * TrackMaxDrivingForce;
 
-	// Ubicación del centro del track
-	FVector ForceLocation = GetComponentLocation();
+	auto Wheels = GetWheels();
+	float ForceMagnitudePerWheel = TotalForceMagnitude / Wheels.Num();
 
-	// GetOwner devuelve el Tank_BP, GetRootComponent devuelve el Tank mesh.
-	// Casteamos a UPrimitiveComponent ya que es la clase de nivel más bajo que permite aplicar fuerza
-	auto TankRoot = Cast<UPrimitiveComponent>(GetOwner()->GetRootComponent());
+	for (ASprungWheel* Wheel : Wheels)
+	{
+		Wheel->AddDrivingForce(ForceMagnitudePerWheel);
+	}
 
-	// Aplicamos fuerza al mesh Tank.
-	TankRoot->AddForceAtLocation(PushForce, ForceLocation);
-
-	//UE_LOG(LogTemp, Warning, TEXT("Applying force of %f to track %s. Input scale: %f"), PushForce.Size(), *GetName(), ThrottleScale)
 }

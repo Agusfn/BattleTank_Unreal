@@ -67,7 +67,7 @@ private:
 
 	// Permite editar el parámetro en la interfaz de unreal. Para la clase o cualquier instancia individualmente.
 	UPROPERTY(EditAnywhere, Category = "Firing")
-	float ProjectileSpeed = 4000; // 40m/s
+	float ProjectileSpeed = 8000; // 80m/s
 
 	// Permite sólo editar la propiedad para la clase de forma general, no individualmente para cada instancia.
 	UPROPERTY(EditDefaultsOnly, Category = "Firing")
